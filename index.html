@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill Finder</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#f6f3ec;--card:#fff;--tx:#14202b;--mu:#5d6772;--ac:#0f2a43;--gold:#b8791a;--bd:#e3ddd0;--wa:#14803c;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1620;--card:#162230;--tx:#eef2f6;--mu:#9aa7b4;--ac:#2f6fa8;--gold:#e0a53a;--bd:#26364a;--wa:#1b9a4a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--ac);color:#fff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+.hd{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font:700 21px Georgia,"Times New Roman",serif;letter-spacing:.2px}
+.logo small{display:block;font:11px system-ui;opacity:.75;letter-spacing:1.2px;text-transform:uppercase}
+.w{max-width:600px;margin:0 auto;padding:16px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+h1,h2{font-family:Georgia,"Times New Roman",serif;margin:6px 0 10px}h1{font-size:26px;line-height:1.2}h2{font-size:21px}
+.mu{color:var(--mu);font-size:14px}
+button,.btn{font:inherit;font-weight:600;font-size:15px;border:0;border-radius:10px;padding:12px 16px;background:var(--ac);color:#fff;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+header button{background:rgba(255,255,255,.15);padding:9px 14px}
+button.g{background:transparent;color:var(--ac);border:1.5px solid var(--bd)}
+@media (prefers-color-scheme:dark){button.g{color:var(--tx)}}
+.wa{background:var(--wa)!important;color:#fff!important}
+.gd{background:var(--gold)!important;color:#fff!important}
+input,select{font:inherit;width:100%;padding:13px;border-radius:10px;border:1.5px solid var(--bd);background:var(--card);color:var(--tx);margin:4px 0 12px}
+input:focus,select:focus{outline:2px solid var(--ac);outline-offset:0}
+label{font-size:14px;font-weight:600}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.chip{flex:none;padding:8px 14px;border-radius:99px;background:var(--card);border:1.5px solid var(--bd);color:var(--tx);font-size:14px;font-weight:500}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:10px 0}
+.card.ft{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.row{display:flex;gap:12px;align-items:center}.grow{flex:1;min-width:0}
+.av{flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font:700 20px Georgia,serif;color:#fff;object-fit:cover}
+.nm{font-weight:700}
+.tag{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:1px}
+.tg1{background:#e4f1e8;color:#14803c}.tg2{background:var(--gold);color:#fff}
+.acts{display:flex;gap:8px;margin-top:12px}.acts>*{flex:1;padding:11px 8px}
+.ad{display:block;background:var(--card);border:1px dashed var(--gold);border-radius:12px;padding:10px 14px;margin:0 0 14px;color:var(--tx);text-decoration:none;font-size:14px}
+.ad b{color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase;display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+.sw{display:flex;align-items:center;gap:10px;font-size:14px;margin:8px 0}.sw input{width:auto;margin:0;transform:scale(1.3)}
+.hide{display:none}.back{background:none;color:var(--ac);padding:6px 0}
+@media (prefers-color-scheme:dark){.back{color:var(--tx)}}
+.stars button{background:none;color:var(--gold);font-size:28px;padding:2px 4px}
+.big{display:block;width:100%;margin:8px 0;text-align:left;padding:16px}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 14px}
+.st div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;text-align:center}
+.st b{display:block;font:700 24px Georgia,serif}
+.sm{padding:8px 10px!important;font-size:13px!important}
+.dots{display:flex;gap:6px;margin-bottom:14px}.dots i{height:4px;flex:1;border-radius:4px;background:var(--bd)}.dots i.on{background:var(--gold)}
+</style></head><body>
+<header><div class="hd"><div class="logo">Skill Finder<small>Find trusted professionals</small></div>
+<div><button id="adm" class="hide">Admin</button> <button id="acct">Join / Log in</button></div></div></header>
+<div class="w">
+
+<div id="ob" class="hide"></div>
+
+<div id="home" class="hide">
+ <a id="ad" class="ad hide" target="_blank" rel="noopener"><b>Sponsored</b><span></span></a>
+ <h1>Find the right person for any job</h1>
+ <input id="q" type="search" placeholder="Search: makeup artist, plumber, tailor..." autocomplete="off">
+ <div class="chips" id="chips"></div>
+ <p class="mu" id="flt"></p>
+ <div id="list"></div>
+ <button class="g hide" id="more" style="width:100%">Show more</button>
+ <div class="sw"><input type="checkbox" id="ds" checked><label for="ds">Data saver: text only, uses very little data</label></div>
+</div>
+
+<div id="prof" class="hide"></div>
+
+<div id="auth" class="hide">
+ <button class="back" id="bk1">&larr; Back</button>
+ <h2 id="atitle">Log in</h2>
+ <label>Email</label><input id="em" type="email" autocomplete="email">
+ <label>Password (at least 6 characters)</label><input id="pw" type="password" autocomplete="current-password">
+ <button id="go" style="width:100%">Log in</button>
+ <p><button class="g" id="swap" style="width:100%"></button></p>
+ <p id="amsg" class="mu"></p>
+</div>
+
+<div id="me" class="hide">
+ <button class="back" id="bk2">&larr; Back</button>
+ <h2>My profile</h2>
+ <label>Full name</label><input id="fn" maxlength="40">
+ <label>What do you do?</label><select id="fj"></select>
+ <input id="fjo" class="hide" placeholder="Type your skill" maxlength="30">
+ <label>Country</label><input id="fc" value="Ghana">
+ <label>City</label><input id="fci" value="Accra">
+ <label>WhatsApp / phone number (with country code)</label><input id="fp" inputmode="tel" placeholder="233240000000">
+ <label>About your work (one line)</label><input id="fd" maxlength="90">
+ <label>Photos of your work (up to 6 in total)</label><input id="ff" type="file" accept="image/*" multiple>
+ <p class="mu">Photos are shrunk automatically to save data.</p>
+ <div class="grid" id="mine"></div>
+ <button id="save" style="width:100%">Save my profile</button>
+ <p id="msg" class="mu"></p>
+ <button class="g" id="out" style="width:100%">Log out</button>
+</div>
+
+<div id="ad2" class="hide">
+ <button class="back" id="bk3">&larr; Back</button>
+ <h2>Owner dashboard</h2>
+ <div class="st" id="stats"></div>
+ <h2>Top banner (advertising)</h2>
+ <input id="bt" maxlength="90" placeholder="Advert text, e.g. Kofix Photography: 20% off this week">
+ <input id="bl" placeholder="Link (https://... or https://wa.me/233...)">
+ <div class="acts"><button id="bs">Show banner</button><button class="g" id="bo">Turn off</button></div>
+ <p id="bm" class="mu"></p>
+ <h2>People who joined</h2>
+ <div id="people"></div>
+</div>
+</div>
+<script>
+// ====== YOUR SUPABASE VALUES (already filled in) ======
+var SUPABASE_URL="https://jgdapdtynjigkdgpofke.supabase.co";
+var SUPABASE_KEY="sb_publishable_txpAcyeLR_O7Saw5niKh9g_VAAn_ZfT";
+// ======================================================
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var CATS=["Photographer","Hairstylist","Makeup artist","Plumber","Mechanic","Driver","Tailor","Teacher","Phone repair","Electronics"];
+var CITIES=["Accra","Kumasi","Tema","Takoradi","Tamale"];
+var COL=["#0f2a43","#7a3b1d","#2d5a3d","#5a2d6e","#8a5a00","#8a2b2b","#17606e"];
+var COLS="id,name,job,city,country,phone,description,photos,rating_avg,rating_count,verified,featured_until";
+var $=function(i){return document.getElementById(i)};
+var user=null,myP=null,isAdmin=false,shown=5,cat="",city="",isNew=false,myPhotos=[],ob={step:0,mode:"find"};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function ini(n){return n.trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join("").toUpperCase()}
+function colr(n){var s=0;for(var i=0;i<n.length;i++)s+=n.charCodeAt(i);return COL[s%COL.length]}
+function show(v){["ob","home","prof","auth","me","ad2"].forEach(function(i){$(i).classList.toggle("hide",i!==v)});window.scrollTo(0,0)}
+function digits(p){return(p.phone||"").replace(/\D/g,"")}
+function waLink(p){var n=digits(p);return n?"https://wa.me/"+n+"?text="+encodeURIComponent("Hi "+p.name+", I found you on Skill Finder."):"#"}
+function isFt(p){return p.featured_until&&new Date(p.featured_until)>new Date()}
+function acts(p){var b=el("div","acts"),v=el("button","g","View work");v.onclick=function(){openP(p)};
+ var w=el("a","btn wa","WhatsApp");w.href=waLink(p);w.target="_blank";w.rel="noopener";
+ var c=el("a","btn g","Call");c.href=digits(p)?"tel:+"+digits(p):"#";b.appendChild(v);b.appendChild(w);b.appendChild(c);return b}
+function badges(n,p){if(p.verified)n.appendChild(el("span","tag tg1","Verified"));if(isFt(p))n.appendChild(el("span","tag tg2","Featured"))}
+
+/* ---------- intro questions ---------- */
+function obDraw(){var d=$("ob");d.textContent="";var dots=el("div","dots");for(var i=0;i<3;i++)dots.appendChild(el("i",i<=ob.step?"on":""));d.appendChild(dots);
+ function opts(list,fn){var c=el("div");list.forEach(function(x){var b=el("button","g big",x);b.onclick=function(){fn(x)};c.appendChild(b)});d.appendChild(c)}
+ if(ob.step===0){d.appendChild(el("h1","","Welcome. What brings you here?"));d.appendChild(el("p","mu","Three quick questions to get you to the right place."));
+  opts(["I need to hire someone","I offer a service and want customers"],function(x){ob.mode=x.indexOf("offer")>-1?"offer":"find";ob.step=1;obDraw()})}
+ else if(ob.step===1){d.appendChild(el("h1","",ob.mode==="offer"?"What do you do?":"What do you need?"));
+  opts(CATS.concat(["Something else"]),function(x){ob.cat=x==="Something else"?"":x;ob.step=2;obDraw()})}
+ else{d.appendChild(el("h1","","Which city?"));
+  opts(CITIES.concat(["Another place"]),function(x){ob.city=x==="Another place"?"":x;obDone()})}
+ var s=el("button","back sm","Skip");s.onclick=obDone;d.appendChild(s);show("ob")}
+function obDone(){try{localStorage.setItem("sf_ob","1")}catch(e){}
+ cat=ob.cat||"";city=ob.city||"";chips();render();
+ if(ob.mode==="offer"){isNew=true;authMode();show("auth")}else show("home")}
+
+/* ---------- search ---------- */
+function chips(){var b=$("chips");b.textContent="";["All"].concat(CATS).forEach(function(c){var x=el("button","chip"+((c==="All"&&!cat)||c===cat?" on":""),c);x.onclick=function(){cat=c==="All"?"":c;shown=5;chips();render()};b.appendChild(x)});
+ $("flt").textContent=city?"Showing results in "+city:"";if(city){var x=el("button","back sm","Show all cities");x.onclick=function(){city="";chips();render()};$("flt").appendChild(document.createTextNode(" "));$("flt").appendChild(x)}}
+async function render(){
+ var t=$("q").value.replace(/[,()%*]/g," ").trim();
+ function base(){var q=sb.from("profiles").select(COLS);if(cat)q=q.eq("job",cat);if(city)q=q.ilike("city","%"+city+"%");if(t)q=q.or("job.ilike.%"+t+"%,name.ilike.%"+t+"%,description.ilike.%"+t+"%,city.ilike.%"+t+"%");return q}
+ var f=await base().gt("featured_until",new Date().toISOString()).order("featured_until",{ascending:false}).limit(3);
+ var n=await base().order("last_active",{ascending:false}).order("rating_avg",{ascending:false}).range(0,shown+3);
+ var l=$("list");l.textContent="";
+ if(n.error){l.appendChild(el("p","mu","Could not load. Check your internet connection."));return}
+ var ids={},d=[];(f.data||[]).forEach(function(p){ids[p.id]=1;d.push(p)});n.data.forEach(function(p){if(!ids[p.id])d.push(p)});
+ if(!d.length)l.appendChild(el("p","mu","No one found yet. Try another word, or be the first to join."));
+ d.slice(0,shown).forEach(function(p){
+  var c=el("div","card"+(isFt(p)?" ft":"")),w=el("div","row"),a;
+  if(!$("ds").checked&&p.photos&&p.photos[0]){a=document.createElement("img");a.src=p.photos[0];a.className="av";a.loading="lazy"}else{a=el("div","av",ini(p.name));a.style.background=colr(p.name)}
+  var g=el("div","grow"),nm=el("div","nm",p.name);badges(nm,p);g.appendChild(nm);g.appendChild(el("div","mu",p.job+" \u00b7 "+p.city));
+  if(p.rating_count)g.appendChild(el("div","mu","\u2605 "+Number(p.rating_avg).toFixed(1)+" ("+p.rating_count+")"));
+  w.appendChild(a);w.appendChild(g);c.appendChild(w);c.appendChild(acts(p));l.appendChild(c)});
+ $("more").classList.toggle("hide",d.length<=shown)}
+async function loadAd(){var r=await sb.from("banners").select("*").eq("active",true).order("created_at",{ascending:false}).limit(1);
+ var a=$("ad");if(r.data&&r.data[0]){a.querySelector("span").textContent=r.data[0].text;a.href=r.data[0].link||"#";a.classList.remove("hide")}else a.classList.add("hide")}
+
+/* ---------- profile page ---------- */
+function openP(p){var d=$("prof");d.textContent="";var b=el("button","back","\u2190 Back");b.onclick=function(){show("home")};d.appendChild(b);
+ var h=el("div","row"),a=el("div","av",ini(p.name));a.style.background=colr(p.name);var g=el("div","grow"),hh=el("h2","",p.name);badges(hh,p);
+ g.appendChild(hh);g.appendChild(el("div","mu",p.job+" \u00b7 "+p.city+", "+p.country));h.appendChild(a);h.appendChild(g);d.appendChild(h);
+ d.appendChild(el("p","",p.description||""));
+ var gr=el("div","grid"),ph=p.photos||[];function put(){ph.forEach(function(s){var i=document.createElement("img");i.src=s;i.loading="lazy";gr.appendChild(i)})}
+ if(ph.length&&$("ds").checked){var lb=el("button","g","Show "+ph.length+" photos (uses a little data)");lb.style.gridColumn="1/3";lb.onclick=function(){lb.remove();put()};gr.appendChild(lb)}else put();
+ d.appendChild(gr);d.appendChild(acts(p));
+ d.appendChild(el("h2","","Rate this person"));var s=el("div","stars");
+ for(var i=1;i<=5;i++)(function(i){var x=el("button","","\u2606");x.onclick=async function(){
+  if(!user){isNew=false;authMode();show("auth");$("amsg").textContent="Please log in to rate.";return}
+  var r=await sb.from("ratings").upsert({profile_id:p.id,rater:user.id,stars:i});x.textContent=r.error?"\u2717":"\u2605";if(!r.error)render()};s.appendChild(x)})(i);
+ d.appendChild(s);show("prof")}
+
+/* ---------- login ---------- */
+function authMode(){$("atitle").textContent=isNew?"Create account":"Log in";$("go").textContent=isNew?"Create account":"Log in";$("swap").textContent=isNew?"I already have an account. Log in":"I am new here. Create account";$("amsg").textContent=""}
+$("swap").onclick=function(){isNew=!isNew;authMode()};
+$("go").onclick=async function(){var e=$("em").value.trim(),p=$("pw").value;$("amsg").textContent="Please wait...";
+ var r=isNew?await sb.auth.signUp({email:e,password:p}):await sb.auth.signInWithPassword({email:e,password:p});
+ if(r.error){$("amsg").textContent=r.error.message;return}
+ if(!r.data.session){$("amsg").textContent="Check your email and tap the link to confirm, then log in.";return}
+ user=r.data.session.user;await afterLogin()};
+$("out").onclick=async function(){await sb.auth.signOut();user=null;myP=null;isAdmin=false;setBtn();show("home")};
+$("acct").onclick=async function(){if(user)await openMe();else{authMode();show("auth")}};
+$("bk1").onclick=$("bk2").onclick=$("bk3").onclick=function(){show("home")};
+function setBtn(){$("acct").textContent=user?"My profile":"Join / Log in";$("adm").classList.toggle("hide",!isAdmin)}
+async function afterLogin(){await loadMe();setBtn();await openMe()}
+async function loadMe(){var r=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();myP=r.data;
+ if(myP)sb.from("profiles").update({last_active:new Date().toISOString()}).eq("id",user.id);
+ var a=await sb.from("admins").select("user_id").eq("user_id",user.id).maybeSingle();isAdmin=!!(a.data)}
+
+/* ---------- my profile ---------- */
+async function openMe(){var p=myP||{};$("fn").value=p.name||"";$("fd").value=p.description||"";$("fp").value=p.phone||"";
+ if(p.city)$("fci").value=p.city;if(p.country)$("fc").value=p.country;
+ if(p.job){if(CATS.indexOf(p.job)>-1)$("fj").value=p.job;else{$("fj").value="Other";$("fjo").value=p.job;$("fjo").classList.remove("hide")}}
+ else if(ob.cat&&CATS.indexOf(ob.cat)>-1)$("fj").value=ob.cat;
+ myPhotos=(p.photos||[]).slice();drawMine();$("msg").textContent="";show("me")}
+function drawMine(){var g=$("mine");g.textContent="";myPhotos.forEach(function(s,i){var w=el("div"),im=document.createElement("img");im.src=s;im.loading="lazy";var x=el("button","g sm","Remove");x.style.width="100%";x.onclick=function(){myPhotos.splice(i,1);drawMine()};w.appendChild(im);w.appendChild(x);g.appendChild(w)})}
+function shrink(f){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(800,im.width),h=im.height*w/im.width,c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);c.toBlob(ok,"image/jpeg",0.6)};im.onerror=function(){ok(null)};im.src=r.result};r.onerror=function(){ok(null)};r.readAsDataURL(f)})}
+$("save").onclick=async function(){
+ var job=$("fj").value==="Other"?$("fjo").value.trim():$("fj").value,nm=$("fn").value.trim();
+ if(!nm||!job){$("msg").textContent="Please add your name and what you do.";return}
+ $("msg").textContent="Saving...";var fs=Array.prototype.slice.call($("ff").files,0,Math.max(0,6-myPhotos.length));
+ for(var i=0;i<fs.length;i++){var b=await shrink(fs[i]);if(!b)continue;var path=user.id+"/"+Date.now()+"-"+i+".jpg";
+  var up=await sb.storage.from("photos").upload(path,b,{contentType:"image/jpeg"});if(!up.error)myPhotos.push(sb.storage.from("photos").getPublicUrl(path).data.publicUrl)}
+ var row={id:user.id,name:nm,job:job,city:$("fci").value.trim(),country:$("fc").value.trim(),phone:$("fp").value.trim(),description:$("fd").value.trim(),photos:myPhotos,last_active:new Date().toISOString()};
+ var r=await sb.from("profiles").upsert(row);if(r.error){$("msg").textContent="Could not save: "+r.error.message;return}
+ myP=Object.assign(myP||{},row);$("ff").value="";drawMine();$("msg").textContent="Saved. People can now find you.";render()};
+function fillSel(){var s=$("fj");CATS.concat(["Other"]).forEach(function(c){var o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o)});s.onchange=function(){$("fjo").classList.toggle("hide",s.value!=="Other")}}
+
+/* ---------- owner dashboard ---------- */
+$("adm").onclick=openAdmin;
+async function openAdmin(){if(!isAdmin)return;show("ad2");
+ var wk=new Date(Date.now()-7*864e5).toISOString(),nw=new Date().toISOString();
+ var t=await sb.from("profiles").select("id",{count:"exact",head:true});
+ var w=await sb.from("profiles").select("id",{count:"exact",head:true}).gte("created_at",wk);
+ var f=await sb.from("profiles").select("id",{count:"exact",head:true}).gt("featured_until",nw);
+ var s=$("stats");s.textContent="";[[t.count,"Total people"],[w.count,"Joined this week"],[f.count,"Featured now"]].forEach(function(x){var d=el("div");d.appendChild(el("b","",String(x[0]||0)));d.appendChild(document.createTextNode(x[1]));s.appendChild(d)});
+ var r=await sb.from("profiles").select("id,name,job,city,created_at,verified,featured_until").order("created_at",{ascending:false}).limit(50);
+ var l=$("people");l.textContent="";
+ (r.data||[]).forEach(function(p){var c=el("div","card"),n=el("div","nm",p.name);badges(n,p);c.appendChild(n);
+  c.appendChild(el("div","mu",p.job+" \u00b7 "+p.city+" \u00b7 joined "+(p.created_at||"").slice(0,10)));
+  var a=el("div","acts");
+  var v=el("button","g sm",p.verified?"Unverify":"Verify");v.onclick=async function(){await sb.from("profiles").update({verified:!p.verified}).eq("id",p.id);openAdmin()};
+  var ft=el("button","g sm",isFt(p)?"Unfeature":"Feature 30 days");ft.onclick=async function(){await sb.from("profiles").update({featured_until:isFt(p)?null:new Date(Date.now()+30*864e5).toISOString()}).eq("id",p.id);openAdmin()};
+  var rm=el("button","g sm","Remove");rm.onclick=async function(){if(confirm("Remove "+p.name+"?")){await sb.from("profiles").delete().eq("id",p.id);openAdmin()}};
+  a.appendChild(v);a.appendChild(ft);a.appendChild(rm);c.appendChild(a);l.appendChild(c)})}
+$("bs").onclick=async function(){var t=$("bt").value.trim();if(!t){$("bm").textContent="Type the advert text first.";return}
+ await sb.from("banners").update({active:false}).eq("active",true);
+ var r=await sb.from("banners").insert({text:t,link:$("bl").value.trim()||null,active:true});$("bm").textContent=r.error?r.error.message:"Banner is live.";loadAd()};
+$("bo").onclick=async function(){await sb.from("banners").update({active:false}).eq("active",true);$("bm").textContent="Banner turned off.";loadAd()};
+
+/* ---------- start ---------- */
+$("q").oninput=function(){shown=5;render()};$("more").onclick=function(){shown+=5;render()};$("ds").onchange=render;
+fillSel();chips();render();loadAd();
+var seen=false;try{seen=!!localStorage.getItem("sf_ob")}catch(e){}
+if(seen)show("home");else obDraw();
+sb.auth.getSession().then(function(r){if(r.data.session){user=r.data.session.user;loadMe().then(setBtn)}});
+</script></body></html>
